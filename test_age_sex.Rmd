@@ -1,9 +1,10 @@
----
----
----
 
 ```{r}
-df <- master
+library('ggplot2')
+```
+
+```{r}
+df = read.csv('master.csv')
 sapply(df, function(x) mean(is.na(df)))
 ```
 
@@ -37,16 +38,24 @@ df %>%
   coord_cartesian(xlim = c(0,500))
 ```
 
+Next ANOVA test is telling us that there is significant difference between sexes.
 
-Task
+But gives no information about which one has the highest suicide rate.
+
 ```{r}
 gen.aov <- aov(suicides_no~sex, data=df)
 summary(gen.aov)
 ```
 
+We run t-test to compare 2 sexes and see if males are more prone to committing suicide then females
+
 ```{r}
 pairwise.t.test(df$suicides_no, as.vector(df$sex))
 ```
+
+Also obvious comparison for 2 samples is plotting.
+
+Results are proven. We see that males are more prone to committing suicides.
 
 ```{r}
 df %>% 
