@@ -1,0 +1,38 @@
+---
+---
+---
+
+```{r}
+df <- master
+sapply(df, function(x) mean(is.na(df)))
+```
+
+Next ANOVA test is telling us that there is significant different group between the generation groups.
+
+But gives no information about which one has the highest suicide rate.
+
+```{r}
+gen.aov <- aov(suicides_no~generation, data=df)
+summary(gen.aov)
+```
+
+```{r}
+pairwise.t.test(df$suicides_no, as.vector(df$generation))
+```
+
+there are significant different from each other.
+
+To find the highest one we test data with t test.
+
+According to the plot we saw Boomers generation is the highest one in term of suicide rate.
+
+ANOVA+Pairwise T-test gives us the result that Boomers generation is the highest in term of suicide rate worldwide.
+
+```{r}
+df %>% 
+  ggplot(aes(y = generation,
+             x = suicides_no,
+             fill = generation) ) +
+  geom_boxplot(alpha = .50) +
+  coord_cartesian(xlim = c(0,500))
+```
