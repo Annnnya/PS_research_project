@@ -16,4 +16,4 @@ Test:??
 
 4. Detemine if world’s, Europe’s,  and Ukraine’s suicide rate tends to increase 
 
-Test:??
+Test: analysis of regression slope
