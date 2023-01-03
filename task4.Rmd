@@ -1,0 +1,87 @@
+---
+title: "task 4"
+output: html_notebook
+---
+
+The goal of fourth part is to determine whether world’s, Europe’s, and Ukraine’s suicide rate tends to increase. For this we use linear regression and analyse p-value and confidence interval for regression slope.
+Slope of linear regression estimates of the value by which the dependent variable is expected to increase or decrease. If the slope is positive, response variable tends to increase as predictor variable increases. Otherwise, it tends to decrease. Our goal is to determine whether suicide rate (response wariable) increases with time (year is a predictor variable), therefoe regression slope is indeed the value we need to analyse. However, we should also take into account how big the dependence between values is and whether we shuold conclude that this dependence exists at all.
+
+```{r}
+all_data = read.csv('master.csv')
+```
+
+For linear regression dependence of suicide rates in Ukraine on time the obtained slope is negative. However, its module is small (approximately 0.16), and p-value for slope is large enough (approximately 0.09). The p-value for each term in linear regression tests the null hypothesis that the coefficient is equal to zero (has no effect). Therefore, at 95% confidence level we should conclude that suicide rates in Ukraine have neither tendention to increase, nor tendention do decrease over time.
+
+```{r}
+data_Ukraine = all_data[all_data$п.їcountry=="Ukraine",]
+suicides_over_years_Ukraine = aggregate(cbind(data_Ukraine$suicides_no,
+                                              data_Ukraine$population),
+          by=list(Year=data_Ukraine$year),
+          FUN=sum)
+suicides_over_years_Ukraine <- transform(suicides_over_years_Ukraine,
+                                         rate=suicides_over_years_Ukraine[2]/suicides_over_years_Ukraine[3]*100000)
+plot(suicides_over_years_Ukraine[,4] ~ suicides_over_years_Ukraine[,1],
+     xlab="year", ylab="suicide rate (per 100k population)",
+     main="Suicide rates per years Ukraine",
+     col="blue", type="p")
+
+regression_model_Ukraine = lm(suicides_over_years_Ukraine[,4] ~ suicides_over_years_Ukraine[,1])
+abline(regression_model_Ukraine, col="dark green")
+
+cat("99% confidence interval for regression slope is",
+confint(regression_model_Ukraine,'suicides_over_years_Ukraine[, 1]',level=0.95))
+summary(regression_model_Ukraine)
+```
+
+For Europe the obtained slope is negative, and though its moddule is small, the p-value is small enough to conclude that there is indded a negative trend of suicide rates in Europe. The p-value for the slope is approximately 0.008, so at confidence level 95% we can conclude that relation exists - Suicide rates in Europe do tend to decrease, even though quantitative value of that decrease is not that big. 
+
+```{r}
+Europe_countries=read.csv("Europe_countries.csv")[,2]
+
+data_Europe = all_data[all_data$п.їcountry %in% Europe_countries,]
+
+suicides_over_years_Europe = aggregate(cbind(data_Europe$suicides_no,
+                                              data_Europe$population),
+          by=list(Year=data_Europe$year),
+          FUN=sum)
+suicides_over_years_Europe <- transform(suicides_over_years_Europe,
+                                         rate=suicides_over_years_Europe[2]/suicides_over_years_Europe[3]*100000)
+
+plot(suicides_over_years_Europe[,4] ~ suicides_over_years_Europe[,1],
+     xlab="year", ylab="suicide rate (per 100k population)",
+     main="Suicide rates per years Europe",
+     col="red", type="p")
+regression_model_Europe = lm(suicides_over_years_Europe[,4] ~ suicides_over_years_Europe[,1])
+abline(regression_model_Europe, col="violet")
+#summary(regression_model_Europe)
+cat("95% confidence interval for regression slope is",
+confint(regression_model_Europe,'suicides_over_years_Europe[, 1]',level=0.95))
+summary(regression_model_Europe)
+```
+
+For the world in a whole the p-value for the slope quite larde, approximately 0.13. Therefore at 95% confidence level we should assume that there is with time worldly suicide rates neither increase, nor decrease.
+
+```{r}
+
+suicides_over_years_world = aggregate(cbind(all_data$suicides_no,
+                                              all_data$population),
+          by=list(Year=all_data$year),
+          FUN=sum)
+suicides_over_years_world <- transform(suicides_over_years_world,
+                                         rate=suicides_over_years_world[2]/suicides_over_years_world[3]*100000)
+
+plot(x=suicides_over_years_world[,1], y=suicides_over_years_world[,4],
+     xlab="year", ylab="suicide rate (per 100k population)",
+     main="Suicide rates per years world",
+     col="orange", type="p")
+
+regression_model_world = lm(suicides_over_years_world[,4] ~ suicides_over_years_world[,1])
+abline(regression_model_world, col="dark green")
+
+cat("95% confidence interval for regression slope is",
+confint(regression_model_world,'suicides_over_years_world[, 1]',level=0.95))
+summary(regression_model_world)
+```
+
+
+
