@@ -1,0 +1,93 @@
+---
+title: "Task2"
+output: html_notebook
+---
+
+The goal of this task is to determine whether suicide rate trend over years in Ukraine depends on suicide rates in Europe and suicide rates in the world.
+
+```{r}
+all_data = read.csv('master.csv')
+```
+
+Let's first find overall rates for years in Ukraine and plot them.
+Here we sum numbers of suicides for all categories in the year and divide bu number of people in those categories to obtain the yearly rate.
+
+```{r}
+data_Ukraine = all_data[all_data$п.їcountry=="Ukraine",]
+suicides_over_years_Ukraine = aggregate(cbind(data_Ukraine$suicides_no,
+                                              data_Ukraine$population),
+          by=list(Year=data_Ukraine$year),
+          FUN=sum)
+suicides_over_years_Ukraine <- transform(suicides_over_years_Ukraine,
+                                         rate=suicides_over_years_Ukraine[2]/suicides_over_years_Ukraine[3]*100000)
+plot(x=suicides_over_years_Ukraine[,1], y=suicides_over_years_Ukraine[,4],
+     xlab="year", ylab="suicide rate (per 100k population)",
+     main="Suicide rates per years Ukraine",
+     col="blue", type="l")
+```
+Then do the same for Europe.
+Here we exclude Ukraine from data, so we will not take into consideration dependence of Ukraine's suicide rates on itself. We also filter years on which there is no data for Ukraine in our dataset.
+
+```{r}
+Europe_countries=read.csv("Europe_countries.csv")[,2]
+#remove Ukraine, so it does not affect statistic
+Europe_countries <- Europe_countries[Europe_countries!="Ukraine"]
+data_Europe = all_data[all_data$п.їcountry %in% Europe_countries,]
+data_Europe = data_Europe[data_Europe$year %in% suicides_over_years_Ukraine$Year,]
+
+suicides_over_years_Europe = aggregate(cbind(data_Europe$suicides_no,
+                                              data_Europe$population),
+          by=list(Year=data_Europe$year),
+          FUN=sum)
+suicides_over_years_Europe <- transform(suicides_over_years_Europe,
+                                         rate=suicides_over_years_Europe[2]/suicides_over_years_Europe[3]*100000)
+
+plot(x=suicides_over_years_Europe[,1], y=suicides_over_years_Europe[,4],
+     xlab="year", ylab="suicide rate (per 100k population)",
+     main="Suicide rates per years Europe",
+     col="red", type="l")
+```
+
+Do the same as for world for Europe
+
+```{r}
+
+data_world = all_data[all_data$year %in% suicides_over_years_Ukraine$Year,]
+data_world = data_world[data_world$п.їcountry!="Ukraine",]
+
+suicides_over_years_world = aggregate(cbind(data_world$suicides_no,
+                                              data_world$population),
+          by=list(Year=data_world$year),
+          FUN=sum)
+suicides_over_years_world <- transform(suicides_over_years_world,
+                                         rate=suicides_over_years_world[2]/suicides_over_years_world[3]*100000)
+
+plot(x=suicides_over_years_world[,1], y=suicides_over_years_world[,4],
+     xlab="year", ylab="suicide rate (per 100k population)",
+     main="Suicide rates per years world",
+     col="orange", type="l")
+```
+
+With Pearson's correlation coefficient 0.78 and small p-value of statistical significance test we can conclude that, indeed, trend of suicide rates in Ukraine depends on suicide trends in Europe.
+
+```{r}
+linear_regression = lm(suicides_over_years_Ukraine[,4] ~ suicides_over_years_Europe[,4])
+plot(suicides_over_years_Ukraine[,4] ~ suicides_over_years_Europe[,4],
+     xlab="suicide rates in Europe", ylab="suicide rates in Ukraine",
+     main="Linear regression plot", col="blue")
+abline(linear_regression, col="red")
+cor.test(suicides_over_years_Ukraine[,4], suicides_over_years_Europe[,4])
+```
+The same goes for suicide rates over year for Ukraine and the world. With correlation coefficient 0.88 suicide rate trend in Ukraine is strongly related to that of the world.
+
+```{r}
+linear_regression = lm(suicides_over_years_Ukraine[,4] ~ suicides_over_years_world[,4])
+plot(suicides_over_years_Ukraine[,4] ~ suicides_over_years_world[,4],
+     xlab="suicide rates in the world", ylab="suicide rates in Ukraine",
+     main="Linear regression plot", col="purple")
+abline(linear_regression, col="orange")
+cor.test(suicides_over_years_Ukraine[,4], suicides_over_years_world[,4])
+```
+
+**Conclusion:**
+Suicide trends in Ukraine indeed depend on trends in Europe and trends in the world. 
