@@ -36,3 +36,23 @@ df %>%
   geom_boxplot(alpha = .50) +
   coord_cartesian(xlim = c(0,500))
 ```
+
+
+Task
+```{r}
+gen.aov <- aov(suicides_no~sex, data=df)
+summary(gen.aov)
+```
+
+```{r}
+pairwise.t.test(df$suicides_no, as.vector(df$sex))
+```
+
+```{r}
+df %>% 
+  ggplot(aes(y = sex,
+             x = suicides_no,
+             fill = sex) ) +
+  geom_boxplot(alpha = .50) +
+  coord_cartesian(xlim = c(0,500))
+```
