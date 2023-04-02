@@ -11,8 +11,7 @@ Test: correlation test
 
 3. Determine wheter in Ukraine males are more prone to suicide then females
 
-Test:??
-*теж порівнювати в кожній віковій категорії окремо (таблиця спряженості)
+Test: ANOVA test
 
 4. Detemine if world’s, Europe’s,  and Ukraine’s suicide rate tends to increase 
 
